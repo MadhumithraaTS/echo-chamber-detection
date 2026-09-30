@@ -1,0 +1,5 @@
+anonymous_60k_user_info/download_status_60k_anonymized.json filter=lfs diff=lfs merge=lfs -text
+anonymous_60k_user_info/echo_chamber_post_metrics.csv filter=lfs diff=lfs merge=lfs -text
+anonymous_60k_user_info/edge_60k_anonymized.csv filter=lfs diff=lfs merge=lfs -text
+anonymous_60k_user_info/posts_flattened_60k.csv filter=lfs diff=lfs merge=lfs -text
+anonymous_60k_user_info/user_posts_60k_anonymized.json filter=lfs diff=lfs merge=lfs -text
