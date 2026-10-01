@@ -141,3 +141,142 @@ ECS =
 + 0.15 × Temporal Persistence
 + 0.15 × Internal Density
 ```
+
+## How to Run the Project
+
+### 1. Prerequisites
+
+Make sure you have the following installed:
+
+- Python 3.9+
+- `pandas`
+- `networkx`
+- `numpy`
+- `scikit-learn`
+- `matplotlib`
+- `scipy`
+
+You can install them with:
+
+```bash
+pip install pandas networkx numpy scikit-learn matplotlib scipy
+```
+
+### 2. Prepare the dataset
+
+Place the dataset folder named `anonymous_60k_user_info` in the same directory as the project scripts, or update each script's `BASE_DIR` path to the location of your data folder.
+
+The scripts currently expect files such as:
+
+- `accounts_info_60k_anonymized.csv`
+- `edge_60k_anonymized.csv`
+- `user_posts_60k_anonymized.json`
+- `posts_flattened_60k.csv`
+- `mastodon_follow_graph.gpickle`
+
+### 3. Run the workflow in order
+
+Open a terminal in the project folder and execute the scripts in this order:
+
+```bash
+python audit_posts.py
+python build_mastodon_graph.py
+python community_analysis.py
+python echo_chamber_analysis.py
+python final_echo_chamber_results.py
+python final_results.py
+python community_topic_analysis.py
+python community_topic_analysis_v2.py
+python echo_chamber_validation.py
+```
+
+### 4. Output files
+
+The scripts generate intermediate CSV files and final results in the same data folder. These outputs are used as input for later scripts, so it is important to run them in sequence.
+
+> Note: Some scripts use hard-coded Windows paths. If you are running the code on another machine or folder layout, edit the `BASE_DIR` variable at the top of each script before running it.
+
+## Why Each File Exists
+
+Below is a short explanation of the purpose of each script in the pipeline.
+
+### Data audit and preprocessing
+
+- `audit_posts.py`  
+  Checks the raw account and post data, validates file presence, inspects columns, and helps identify the correct IDs needed to merge datasets. This is the initial quality-control step.
+
+- `build_mastodon_graph.py`  
+  Builds the Mastodon follow network as a directed graph using accounts and follow edges. It creates the graph object, saves the node/edge tables, and prepares the network for community detection and network analysis.
+
+### Community and network analysis
+
+- `community_analysis.py`  
+  Loads the constructed graph and computes community-level structural metrics such as node count, edge count, degree distributions, density, and Louvain community assignment statistics.
+
+- `echo_chamber_analysis.py`  
+  Calculates the core echo-chamber metrics: internal edge ratio, conductance, internal density, content similarity, temporal persistence, and overall echo-chamber strength for each community. This is the main quantitative analysis script.
+
+- `echo_chamber_validation.py`  
+  Validates the results by checking whether metric patterns are consistent with echo-chamber behavior. It often produces correlation and sensitivity checks to test the reliability of the final conclusions.
+
+### Final result generation
+
+- `final_echo_chamber_results.py`  
+  Filters communities to those large enough for analysis and creates a final ranked list of eligible echo chambers. It prepares the dataset used for final interpretation and reporting.
+
+- `final_results.py`  
+  Produces the final ranked echo-chamber results, summary tables, and supporting plots for the selected communities. This script is used to generate the final output for the study.
+
+### Topic and content analysis
+
+- `community_topic_analysis.py`  
+  Uses TF-IDF on posts from selected communities to identify key terms and hashtags associated with each community. This helps explain the dominant themes or discourse inside communities.
+
+- `community_topic_analysis_v2.py`  
+  A second version of the topic analysis that refines the process by focusing on meaningful community-level topics and cleaned hashtags. It is useful for richer qualitative interpretation of top communities.
+
+### Summary and reporting
+
+- `final_echo_chamber_results.py` and `final_results.py`  
+  These scripts turn the raw metrics into final, interpretable results that can be used in reports, presentations, and research summaries.
+
+## Recommended workflow
+
+For a typical execution, use this sequence:
+
+1. Run `audit_posts.py` to validate the data.
+2. Run `build_mastodon_graph.py` to build the network.
+3. Run `community_analysis.py` to detect communities and compute basic network statistics.
+4. Run `echo_chamber_analysis.py` to calculate the echo chamber metrics.
+5. Run `final_echo_chamber_results.py` to filter and rank eligible communities.
+6. Run `final_results.py` to finalize the main output.
+7. Run the topic-analysis scripts to interpret the content of the strongest communities.
+8. Run `echo_chamber_validation.py` to verify the findings.
+
+This order reflects the actual data dependency chain of the project: raw data → network construction → community detection → metric analysis → final ranking → interpretation and validation.
+
+## Notes
+
+- The project is designed for exploratory research and data analysis rather than a single click execution pipeline.
+- If you want a cleaner reproducible setup, it is recommended to create a virtual environment before installing the Python dependencies.
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install pandas networkx numpy scikit-learn matplotlib scipy
+```
+
+- After activation, run the scripts in the same order listed above.
+
+## End Goal
+
+The full workflow supports identifying which communities in the Mastodon network behave like echo chambers by combining:
+
+- network structure,
+- community segmentation,
+- content similarity,
+- temporal activity,
+- and final community ranking.
+
+This enables the project to distinguish ordinary communities from strongly isolated, internally cohesive discussion groups.
+```
